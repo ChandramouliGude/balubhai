@@ -1,0 +1,14 @@
+extends layout
+
+block content
+  .row.banner
+    .col-12
+      h1= pageHeader.title
+        small &nbsp;#{pageHeader.strapline}
+
+
+    .col-12.col-md-4
+      p.lead Looking to donate?
+
+      // Button that redirects to the donation review form
+      a.btn.btn-primary.btn-lg(href="http://localhost:3000/location/review/new") Make a Donation

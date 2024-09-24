@@ -1,0 +1,99 @@
+extends layout
+
+block content
+  .container.mt-5
+    h1.text-center.mb-4 User Reviews
+
+    // Section to display existing reviews
+    .row
+      .col-md-8.offset-md-2
+        #reviews
+          .card.mb-4
+            .card-body
+              h5.card-title John Doe
+              p.card-text "Great platform! Happy to donate."
+              .text-warning
+                i.fas.fa-star
+                i.fas.fa-star
+                i.fas.fa-star
+                i.fas.fa-star
+                i.far.fa-star
+            .card-footer.text-muted
+              | Posted on 2024-09-22
+
+    hr.my-5
+
+    // Form to submit reviews without page navigation
+    h2.text-center.mb-4 Submit Your Review
+    .row
+      .col-md-8.offset-md-2
+        form(id='reviewForm')
+          .form-group
+            label(for='username') Username
+            input.form-control#username(type='text', placeholder='Enter your name', required)
+          .form-group
+            label(for='comment') Comment
+            textarea.form-control#comment(placeholder='Write your review...', rows='3', required)
+          .form-group
+            label(for='rating') Rating
+            .star-rating
+              input#rating(type='hidden', value='0')
+              each val in [1, 2, 3, 4, 5]
+                i.far.fa-star.fa-2x(data-value=val, style='cursor: pointer;', onclick='rate(this)')
+          button.btn.btn-primary(type='submit') Submit Review
+
+    // Script to handle review submission and dynamic rendering
+    script.
+      function rate(element) {
+        // Get the rating value from the clicked star
+        var rating = element.getAttribute('data-value');
+        document.getElementById('rating').value = rating;
+        
+        // Get all star elements
+        var stars = document.querySelectorAll('.star-rating .fa-star');
+
+        // Reset the stars (remove filled classes)
+        stars.forEach(star => {
+          star.classList.remove('fas');
+          star.classList.add('far');
+        });
+
+        // Fill the clicked star and all the previous ones
+        for (var i = 0; i < rating; i++) {
+          stars[i].classList.remove('far');
+          stars[i].classList.add('fas');
+        }
+      }
+
+      document.getElementById('reviewForm').onsubmit = function(e) {
+        e.preventDefault();
+        
+        // Get the values from the form
+        var username = document.getElementById('username').value;
+        var comment = document.getElementById('comment').value;
+        var rating = document.getElementById('rating').value;
+        var today = new Date().toISOString().slice(0, 10);
+        
+        // Build new review HTML
+        var reviewHTML = `
+          <div class="card mb-4">
+            <div class="card-body">
+              <h5 class="card-title">${username}</h5>
+              <p class="card-text">${comment}</p>
+              <div class="text-warning">
+                ${[...Array(5).keys()].map(i => i < rating ? '<i class="fas fa-star"></i>' : '<i class="far fa-star"></i>').join('')}
+              </div>
+            </div>
+            <div class="card-footer text-muted">Posted on <span>${today}</span></div>
+          </div>`;
+        
+        // Insert the new review at the top of the reviews section
+        document.getElementById('reviews').insertAdjacentHTML('afterbegin', reviewHTML);
+        
+        // Reset the form and rating
+        document.getElementById('reviewForm').reset();
+        document.getElementById('rating').value = '0';
+        var stars = document.querySelectorAll('.star-rating .fa-star');
+        stars.forEach(star => star.classList.remove('fas'));
+        stars.forEach(star => star.classList.add('far'));
+      }
